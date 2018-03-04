@@ -5,15 +5,11 @@ references:
         machine: true
 
 jobs:
-    checkout_code:
+    build_image:
         <<: *spec
         steps:
             - checkout
             - run: echo Code checked out
-
-    build_image:
-        <<: *spec
-        steps:
             - run:
                 name: Build the build environment Docker image
                 command: echo docker build -t $IMAGE_NAME tools/docker
@@ -66,19 +62,16 @@ jobs:
           - run:
               name: Push the Phylanx build environment Docker image
               command: |
-                    echo if [ "$CIRCLE_BRANCH" == "master" ]; then
-                    echo     docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
-                    echo     docker push ${IMAGE_NAME}
-                    echo fi
+                    echo 'if [ "$CIRCLE_BRANCH" == "master" ]; then'
+                    echo '    docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}'
+                    echo '    docker push ${IMAGE_NAME}'
+                    echo 'fi'
 
 workflows:
     version: 2
     build_and_deploy:
         jobs:
-            - checkout_code
-            - build_image:
-                requires:
-                    - checkout_code
+            - build_image
             - configure:
                 requires:
                     - build_image
