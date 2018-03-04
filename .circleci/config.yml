@@ -2,8 +2,7 @@ version: 2
 
 references:
     container: &container
-        docker:
-            - image: debian:stretch
+        machine: true
 
 jobs:
     checkout_code:
