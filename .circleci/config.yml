@@ -1,24 +1,24 @@
 version: 2
 
 references:
-    container: &container
+    spec: &spec
         machine: true
 
 jobs:
     checkout_code:
-        <<: *container
+        <<: *spec
         steps:
             - checkout
             - run: echo Code checked out
 
-    display_message:
-        <<: *container
+    build_image:
+        <<: *spec
         steps:
             - run:
                 name: Greeting
                 command: echo Hello, world.
-    print_time:
-        <<: *container
+    configure:
+        <<: *spec
         steps:
           - run:
               name: Print the Current Time
@@ -29,9 +29,9 @@ workflows:
     build_and_deploy:
         jobs:
             - checkout_code
-            - display_message:
+            - build_image:
                 requires:
                     - checkout_code
-            - print_time:
+            - configure:
                 requires:
-                    - display_message
+                    - build_image
