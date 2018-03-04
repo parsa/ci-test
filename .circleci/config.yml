@@ -1,22 +1,38 @@
 version: 2
-#defaults: &defaults
-#    machine: true
-#    environment:
-#        IMAGE_NAME: stellargroup/phylanx:dev
+
+references:
+    container: &container
+        docker:
+            - image: debian:stretch
 
 jobs:
     checkout_code:
-        #<<: *defaults
-        branches:
-            ignore: gh-pages
+        <<: *container
         steps:
             - checkout
-        run:
-            - echo Hello World!
+            - run: echo Code checked out
+
+    display_message:
+        <<: *container
+        steps:
+            - run:
+                name: Greeting
+                command: echo Hello, world.
+    print_time:
+        <<: *container
+        steps:
+          - run:
+              name: Print the Current Time
+              command: date
 
 workflows:
     version: 2
-    all:
+    build_and_deploy:
         jobs:
             - checkout_code
-
+            - display_message:
+                requires:
+                    - checkout_code
+            - print_time:
+                requires:
+                    - display_message
