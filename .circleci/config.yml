@@ -32,6 +32,22 @@ jobs:
           - run:
               name: Check the formatting of Phylanx's Python files
               command: echo docker run -v $PWD:/phylanx -w /phylanx ${IMAGE_NAME} flake8 --config=tools/flake8/config.ini .
+    inspect:
+        <<: *spec
+        steps:
+          - run:
+              name: Build the Inspect tool
+              command: echo docker run -v $PWD:/phylanx -w /phylanx/build ${IMAGE_NAME} make -j2 -k tools.inspect
+          - run:
+              name: Create artifact directory
+              command: echo mkdir artifacts
+          - run:
+              name: Check the formatting of Phylanx's C++ files
+              command: echo docker run -v $PWD:/phylanx -w /phylanx ${IMAGE_NAME} ./build/bin/inspect --all --output=./build/phylanx_inspect_report.html /phylanx
+          - run:
+              command: echo cp build/phylanx_inspect_report.html artifacts
+          - store_artifacts:
+              path: artifacts
 
 workflows:
     version: 2
@@ -47,3 +63,6 @@ workflows:
             - flake:
                 requires:
                     - build_image
+            - inspect:
+                requires:
+                    - configure
