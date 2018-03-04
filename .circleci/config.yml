@@ -52,20 +52,24 @@ jobs:
         <<: *spec
         steps:
           - run:
-              name: Core
-              command: echo core
+              name: Build all targets
+              command: echo docker run -v $PWD:/phylanx -w /phylanx/build ${IMAGE_NAME} make -j2
     tests:
         <<: *spec
         steps:
           - run:
-              name: Tests
-              command: echo tests
+              name: Run all tests
+              command: docker run -v $PWD:/phylanx -w /phylanx/build ${IMAGE_NAME} make -j2 tests
     deploy:
         <<: *spec
         steps:
           - run:
-              name: Deploy
-              command: echo deploy
+              name: Push the Phylanx build environment Docker image
+              command: |
+                    echo if [ "$CIRCLE_BRANCH" == "master" ]; then
+                    echo     docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+                    echo     docker push ${IMAGE_NAME}
+                    echo fi
 
 workflows:
     version: 2
