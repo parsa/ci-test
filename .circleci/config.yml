@@ -48,6 +48,24 @@ jobs:
               command: echo cp build/phylanx_inspect_report.html artifacts
           - store_artifacts:
               path: artifacts
+    core:
+        <<: *spec
+        steps:
+          - run:
+              name: Core
+              command: echo core
+    tests:
+        <<: *spec
+        steps:
+          - run:
+              name: Tests
+              command: echo tests
+    deploy:
+        <<: *spec
+        steps:
+          - run:
+              name: Deploy
+              command: echo deploy
 
 workflows:
     version: 2
@@ -66,3 +84,14 @@ workflows:
             - inspect:
                 requires:
                     - configure
+            - core:
+                requires:
+                    - inspect
+            - tests:
+                requires:
+                    - core
+            - deploy:
+                requires:
+                    - flake
+                    - inspect
+                    - tests
