@@ -1,0 +1,22 @@
+version: 2
+#defaults: &defaults
+#    machine: true
+#    environment:
+#        IMAGE_NAME: stellargroup/phylanx:dev
+
+jobs:
+    checkout_code:
+        #<<: *defaults
+        branches:
+            ignore: gh-pages
+        steps:
+            - checkout
+        run:
+            - echo Hello World!
+
+workflows:
+    version: 2
+    all:
+        jobs:
+            - checkout_code
+
