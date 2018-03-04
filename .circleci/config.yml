@@ -15,14 +15,23 @@ jobs:
         <<: *spec
         steps:
             - run:
-                name: Greeting
-                command: echo Hello, world.
+                name: Build the build environment Docker image
+                command: echo docker build -t $IMAGE_NAME tools/docker
+            - run:
+                name: Create build directory
+                command: echo mkdir build
     configure:
         <<: *spec
         steps:
           - run:
-              name: Print the Current Time
-              command: date
+              name: Run CMake
+              command: echo docker run -v $PWD:/phylanx -w /phylanx/build -e "CIRCLECI=true" ${IMAGE_NAME} cmake -DPHYLANX_WITH_GIT_COMMIT=${CIRCLE_SHA1} -DPHYLANX_WITH_TOOLS=On -DHPX_DIR=/usr/local/lib/cmake/HPX -Dpybind11_DIR=/pybind11/share/cmake/pybind11/ -Dblaze_DIR=/blaze/share/blaze/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DPHYLANX_WITH_HIGHFIVE=On -DHighFive_DIR=/highfive/share/HighFive/CMake ..
+    flake:
+        <<: *spec
+        steps:
+          - run:
+              name: Check the formatting of Phylanx's Python files
+              command: echo docker run -v $PWD:/phylanx -w /phylanx ${IMAGE_NAME} flake8 --config=tools/flake8/config.ini .
 
 workflows:
     version: 2
@@ -33,5 +42,8 @@ workflows:
                 requires:
                     - checkout_code
             - configure:
+                requires:
+                    - build_image
+            - flake:
                 requires:
                     - build_image
