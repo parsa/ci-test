@@ -16,6 +16,9 @@ jobs:
             - run:
                 name: Create build directory
                 command: echo mkdir build
+            - run: mkdir -p junit
+            - run: ./inspect_to_junit.py reports/inspect_1881.html >junit/inspect.xml
+            - run: ./flake_to_junit.py reports/flake_out.txt >junit/flake.xml
             - store_test_results:
                 path: ~/ci-test/junit
 
